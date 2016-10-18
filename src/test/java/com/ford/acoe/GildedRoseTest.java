@@ -199,8 +199,8 @@ public class GildedRoseTest {
 	// - "Backstage passes" Quality increases by 3 when there are 5 days or less
 	@Test
 	public void backStagePassesIncreasesQualityFasterWhenFiveDaysBeforeTheConcert() {
-		int SELLIN = 5;
-		int QUALITY = 20;
+		SELLIN = 5;
+		QUALITY = 20;
 		initGildedRose(createItem(BACKSTAGE_PASSES, SELLIN, QUALITY));
 
 		app.updateQuality();
@@ -211,8 +211,8 @@ public class GildedRoseTest {
 	// - "Backstage passes" Quality increases by 3 when there are 5 days or less
 	@Test
 	public void backStagePassesIncreasesQualityBy3WhenOneDayBeforeTheConcert() {
-		int SELLIN = 1;
-		int QUALITY = 20;
+		SELLIN = 1;
+		QUALITY = 20;
 		initGildedRose(createItem(BACKSTAGE_PASSES, SELLIN, QUALITY));
 
 		app.updateQuality();
@@ -223,8 +223,8 @@ public class GildedRoseTest {
 	// - "Backstage passes" Quality drops to 0 after the concert
 	@Test
 	public void backStagePassesQualityGoesTo0AtTheEndOfDayOfTheConcert() {
-		int SELLIN = 0;
-		int QUALITY = 20;
+		SELLIN = 0;
+		QUALITY = 20;
 		initGildedRose(createItem(BACKSTAGE_PASSES, SELLIN, QUALITY));
 
 		app.updateQuality();
@@ -235,8 +235,8 @@ public class GildedRoseTest {
 	// - "Backstage passes" Quality drops to 0 after the concert
 	@Test
 	public void backStagePassesQualityIsStillZeroWhenFiveDaysAfterTheConcert() {
-		int SELLIN = -5;
-		int QUALITY = 20;
+		SELLIN = -5;
+		QUALITY = 20;
 		initGildedRose(createItem(BACKSTAGE_PASSES, SELLIN, QUALITY));
 
 		app.updateQuality();
