@@ -281,7 +281,6 @@ public class GildedRoseTest {
 	@Test
 	public void causeNegativePathCoverageOnLines31and37() {
 		QUALITY = 49;
-		SELLIN = 4;
 		app = initGildedRose(createItem(BACKSTAGE_PASSES, SELLIN, QUALITY));
 
 		app.updateQuality();
@@ -292,7 +291,6 @@ public class GildedRoseTest {
 	@Test
 	public void causeCoverageOnLine62AndPositivePathOnLine61() {
 		QUALITY = 49;
-		SELLIN = -1;
 		app = initGildedRose(createItem(AGED_BRIE, SELLIN, QUALITY));
 
 		app.updateQuality();
@@ -325,7 +323,6 @@ public class GildedRoseTest {
 	@Test
 	public void causeCoverageToNegativeCaseOfLine53() {
 		QUALITY = 5;
-		SELLIN = -1;
 		app = initGildedRose(createItem(SULFURAS, SELLIN, QUALITY));
 
 		app.updateQuality();
