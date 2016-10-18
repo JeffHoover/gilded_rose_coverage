@@ -1,6 +1,6 @@
 package com.ford.acoe;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -244,6 +244,14 @@ public class GildedRoseTest {
 	}
 
 	@Test
+	public void itemCanPrettyPrint() {
+		app = initGildedRose(createItem(SULFURAS, SELLIN, SULFURAS_QUALITY));
+
+		String expectedString = "Sulfuras, Hand of Ragnaros, " + SELLIN + ", " + SULFURAS_QUALITY;
+		assertEquals(expectedString, app.items[0].toString());
+	}
+	
+	@Test
 	public void UNDOCUMENTED_agedBrieStartingAbove50QualityDoesNotChangeQuality() {
 		QUALITY = 55;
 		app = initGildedRose(createItem(AGED_BRIE, SELLIN, QUALITY));
@@ -268,6 +276,61 @@ public class GildedRoseTest {
 
 	private void assertSellin(int expectedSellin, Item item) {
 		assertEquals(expectedSellin, item.sellIn);
+	}
+
+	@Test
+	public void causeNegativePathCoverageOnLines31and37() {
+		QUALITY = 49;
+		SELLIN = 4;
+		app = initGildedRose(createItem(BACKSTAGE_PASSES, SELLIN, QUALITY));
+
+		app.updateQuality();
+
+		assertQuality(QUALITY + 1, app.items[0]);
+	}
+
+	@Test
+	public void causeCoverageOnLine62AndPositivePathOnLine61() {
+		QUALITY = 49;
+		SELLIN = -1;
+		app = initGildedRose(createItem(AGED_BRIE, SELLIN, QUALITY));
+
+		app.updateQuality();
+
+		assertQuality(QUALITY + 1, app.items[0]);
+	}
+
+	@Test
+	public void w() {
+		QUALITY = -1;
+		SELLIN = -1;
+		app = initGildedRose(createItem(AGED_BRIE, SELLIN, QUALITY));
+
+		app.updateQuality();
+
+		assertQuality(1, app.items[0]);
+	}
+
+	@Test
+	public void v() {
+		QUALITY = -1;
+		SELLIN = -1;
+		app = initGildedRose(createItem(ORDINARY_ITEM, SELLIN, QUALITY));
+
+		app.updateQuality();
+
+		assertQuality(-1, app.items[0]);
+	}
+
+	@Test
+	public void u() {
+		QUALITY = 5;
+		SELLIN = -1;
+		app = initGildedRose(createItem(SULFURAS, SELLIN, QUALITY));
+
+		app.updateQuality();
+
+		assertQuality(5, app.items[0]);
 	}
 
 }
