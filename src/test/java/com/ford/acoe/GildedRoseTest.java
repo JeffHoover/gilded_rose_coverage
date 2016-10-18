@@ -301,36 +301,36 @@ public class GildedRoseTest {
 	}
 
 	@Test
-	public void w() {
+	public void causeCoverageToPositiveCaseOfLine51() {
 		QUALITY = -1;
 		SELLIN = -1;
 		app = initGildedRose(createItem(AGED_BRIE, SELLIN, QUALITY));
 
 		app.updateQuality();
 
-		assertQuality(1, app.items[0]);
+		assertQuality(QUALITY + 2, app.items[0]);
 	}
 
 	@Test
-	public void v() {
+	public void causeCoverageToNegativeCaseOfLine52() {
 		QUALITY = -1;
 		SELLIN = -1;
 		app = initGildedRose(createItem(ORDINARY_ITEM, SELLIN, QUALITY));
 
 		app.updateQuality();
 
-		assertQuality(-1, app.items[0]);
+		assertQuality(QUALITY, app.items[0]);
 	}
 
 	@Test
-	public void u() {
+	public void causeCoverageToNegativeCaseOfLine53() {
 		QUALITY = 5;
 		SELLIN = -1;
 		app = initGildedRose(createItem(SULFURAS, SELLIN, QUALITY));
 
 		app.updateQuality();
 
-		assertQuality(5, app.items[0]);
+		assertQuality(QUALITY, app.items[0]);
 	}
 
 }
