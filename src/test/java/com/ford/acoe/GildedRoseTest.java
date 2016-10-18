@@ -7,6 +7,11 @@ import org.junit.Test;
 
 public class GildedRoseTest {
 
+	private static final int QUALITY_LIMIT = 50;
+	private static final int QUALITY_DECREMENT = 1;
+	private static final int FAST_QUALITY_DECREMENT = 2;
+	private static final int FASTER_QUALITY_INCREMENT = 3;
+	
 	// TODO - Might make sense to have these static on the GildedRose class:
 	// GildedRose.AGED_BRIE ...
 	private static final String AGED_BRIE = "Aged Brie";
@@ -14,7 +19,7 @@ public class GildedRoseTest {
 	private static final String BACKSTAGE_PASSES = "Backstage passes to a TAFKAL80ETC concert";
 	private static final String ORDINARY_ITEM = "ordinary";
 
-	// Sulfuras" is a legendary item and as such its Quality is 80 and it never
+	// "Sulfuras" is a legendary item and as such its Quality is 80 and it never
 	// alters.
 	private static final int SULFURAS_QUALITY = 80;
 
@@ -23,38 +28,33 @@ public class GildedRoseTest {
 
 	private GildedRose app;
 
-	@Before
-	public void setup() {
-		app = null;
-	}
-
 	// - At the end of each day our system lowers Quality for every item
 	@Test
-	public void ordinaryItemQualityDecreasesBy1Daily() {
+	public void ordinaryItemQualityDecreasesDaily() {
 		QUALITY = 12;
-		app = initGildedRose(createItem(ORDINARY_ITEM, SELLIN, QUALITY));
+		initGildedRose(createItem(ORDINARY_ITEM, SELLIN, QUALITY));
 
 		app.updateQuality();
 
-		assertQuality(QUALITY - 1, app.items[0]);
+		assertQuality(QUALITY - QUALITY_DECREMENT, app.items[0]);
 	}
 
 	// - At the end of each day our system lowers Quality for every item
 	@Test
-	public void ordinaryItemQualityDecreasesBy1Daily_EvenIfQualityStartsAbove50() {
+	public void ordinaryItemQualityDecreasesDaily_EvenIfQualityStartsAbove50() {
 		QUALITY = 55;
-		app = initGildedRose(createItem(ORDINARY_ITEM, SELLIN, QUALITY));
+		initGildedRose(createItem(ORDINARY_ITEM, SELLIN, QUALITY));
 
 		app.updateQuality();
 
-		assertQuality(QUALITY - 1, app.items[0]);
+		assertQuality(QUALITY - QUALITY_DECREMENT, app.items[0]);
 	}
 
 	// - At the end of each day our system lowers Sellin for every item
 	@Test
-	public void ordinaryItemSellInDecreasesBy1Daily() {
+	public void ordinaryItemSellInDecreasesDaily() {
 		SELLIN = 10;
-		app = initGildedRose(createItem(ORDINARY_ITEM, SELLIN, QUALITY));
+		initGildedRose(createItem(ORDINARY_ITEM, SELLIN, QUALITY));
 		app.updateQuality();
 
 		assertSellin(SELLIN - 1, app.items[0]);
@@ -64,7 +64,7 @@ public class GildedRoseTest {
 	@Test
 	public void ordinaryItemSellinContinuesToDecrease_EvenAfterSellinIsZero() {
 		SELLIN = 2;
-		app = initGildedRose(createItem(ORDINARY_ITEM, SELLIN, QUALITY));
+		initGildedRose(createItem(ORDINARY_ITEM, SELLIN, QUALITY));
 
 		app.updateQuality();
 		app.updateQuality();
@@ -81,16 +81,17 @@ public class GildedRoseTest {
 	public void ordinaryItemQualityDecreasesTwiceAsFastAfterSellinIsZero() {
 		SELLIN = 2;
 		QUALITY = 20;
-		app = initGildedRose(createItem(ORDINARY_ITEM, SELLIN, QUALITY));
+		initGildedRose(createItem(ORDINARY_ITEM, SELLIN, QUALITY));
 
 		app.updateQuality();
 		app.updateQuality();
+		int expectedQuality = QUALITY - 2 * QUALITY_DECREMENT;
 
 		app.updateQuality();
 		app.updateQuality();
 		app.updateQuality();
 
-		int expectedQuality = QUALITY - 1 - 1 - 2 - 2 - 2;
+		expectedQuality = expectedQuality - 3 * FAST_QUALITY_DECREMENT;
 
 		assertQuality(expectedQuality, app.items[0]);
 	}
@@ -99,7 +100,7 @@ public class GildedRoseTest {
 	@Test
 	public void ordinaryItemQualityNeverGoesNegative() {
 		QUALITY = 1;
-		app = initGildedRose(createItem(ORDINARY_ITEM, SELLIN, QUALITY));
+		initGildedRose(createItem(ORDINARY_ITEM, SELLIN, QUALITY));
 
 		app.updateQuality();
 		app.updateQuality();
@@ -113,7 +114,7 @@ public class GildedRoseTest {
 	public void agedBrieQualityIncreasesDaily() {
 
 		QUALITY = 10;
-		app = initGildedRose(createItem(AGED_BRIE, SELLIN, QUALITY));
+		initGildedRose(createItem(AGED_BRIE, SELLIN, QUALITY));
 
 		app.updateQuality();
 		app.updateQuality();
@@ -123,22 +124,22 @@ public class GildedRoseTest {
 
 	// - The Quality of an item is never more than 50
 	@Test
-	public void agedBrieQualityNeverIncreasesPast50() {
+	public void agedBrieQualityNeverIncreasesPastQualityLimit() {
 
 		QUALITY = 49;
-		app = initGildedRose(createItem(AGED_BRIE, SELLIN, QUALITY));
+		initGildedRose(createItem(AGED_BRIE, SELLIN, QUALITY));
 
 		app.updateQuality();
 		app.updateQuality();
 
-		assertQuality(50, app.items[0]);
+		assertQuality(QUALITY_LIMIT, app.items[0]);
 	}
 
 	// - "Sulfuras", being a legendary item, never has to be sold
 	@Test
 	public void sulfurasNeverDecreasesSellIn() {
 		SELLIN = 2;
-		app = initGildedRose(createItem(SULFURAS, SELLIN, SULFURAS_QUALITY));
+		initGildedRose(createItem(SULFURAS, SELLIN, SULFURAS_QUALITY));
 		app.updateQuality();
 		app.updateQuality();
 
@@ -149,7 +150,7 @@ public class GildedRoseTest {
 	@Test
 	public void sulfurasNeverDecreasesQuality() {
 		QUALITY = 49;
-		app = initGildedRose(createItem(SULFURAS, SELLIN, SULFURAS_QUALITY));
+		initGildedRose(createItem(SULFURAS, SELLIN, SULFURAS_QUALITY));
 
 		app.updateQuality();
 		app.updateQuality();
@@ -159,10 +160,10 @@ public class GildedRoseTest {
 
 	// - "Backstage passes" increases in Quality as its SellIn value approaches;
 	@Test
-	public void backStagePassesIncreasesQualityBy1WhenElevenDaysBeforeTheConcert() {
+	public void backStagePassesIncreasesQualityWhenElevenDaysBeforeTheConcert() {
 		QUALITY = 2;
 		SELLIN = 11;
-		app = initGildedRose(createItem(BACKSTAGE_PASSES, SELLIN, QUALITY));
+		initGildedRose(createItem(BACKSTAGE_PASSES, SELLIN, QUALITY));
 
 		app.updateQuality();
 
@@ -172,39 +173,39 @@ public class GildedRoseTest {
 	// - "Backstage passes" Quality increases by 2 when there are 10 days or
 	// less
 	@Test
-	public void backStagePassesIncreasesQualityBy2WhenTenDaysBeforeTheConcert() {
+	public void backStagePassesIncreasesQualityFastWhenTenDaysBeforeTheConcert() {
 		QUALITY = 2;
 		SELLIN = 10;
-		app = initGildedRose(createItem(BACKSTAGE_PASSES, SELLIN, QUALITY));
+		initGildedRose(createItem(BACKSTAGE_PASSES, SELLIN, QUALITY));
 
 		app.updateQuality();
 
-		assertQuality(QUALITY + 2, app.items[0]);
+		assertQuality(QUALITY + FAST_QUALITY_DECREMENT, app.items[0]);
 	}
 
 	// - "Backstage passes" Quality increases by 2 when there are 10 days or
 	// less
 	@Test
-	public void backStagePassesIncreasesQualityBy2WhenSixDaysBeforeTheConcert() {
+	public void backStagePassesIncreasesQualityFastWhenSixDaysBeforeTheConcert() {
 		QUALITY = 2;
 		SELLIN = 6;
-		app = initGildedRose(createItem(BACKSTAGE_PASSES, SELLIN, QUALITY));
+		initGildedRose(createItem(BACKSTAGE_PASSES, SELLIN, QUALITY));
 
 		app.updateQuality();
 
-		assertQuality(QUALITY + 2, app.items[0]);
+		assertQuality(QUALITY + FAST_QUALITY_DECREMENT, app.items[0]);
 	}
 
 	// - "Backstage passes" Quality increases by 3 when there are 5 days or less
 	@Test
-	public void backStagePassesIncreasesQualityBy3WhenFiveDaysBeforeTheConcert() {
+	public void backStagePassesIncreasesQualityFasterWhenFiveDaysBeforeTheConcert() {
 		int SELLIN = 5;
 		int QUALITY = 20;
-		app = initGildedRose(createItem(BACKSTAGE_PASSES, SELLIN, QUALITY));
+		initGildedRose(createItem(BACKSTAGE_PASSES, SELLIN, QUALITY));
 
 		app.updateQuality();
 
-		assertQuality(QUALITY + 3, app.items[0]);
+		assertQuality(QUALITY + FASTER_QUALITY_INCREMENT, app.items[0]);
 	}
 
 	// - "Backstage passes" Quality increases by 3 when there are 5 days or less
@@ -212,11 +213,11 @@ public class GildedRoseTest {
 	public void backStagePassesIncreasesQualityBy3WhenOneDayBeforeTheConcert() {
 		int SELLIN = 1;
 		int QUALITY = 20;
-		app = initGildedRose(createItem(BACKSTAGE_PASSES, SELLIN, QUALITY));
+		initGildedRose(createItem(BACKSTAGE_PASSES, SELLIN, QUALITY));
 
 		app.updateQuality();
 
-		assertQuality(QUALITY + 3, app.items[0]);
+		assertQuality(QUALITY + FASTER_QUALITY_INCREMENT, app.items[0]);
 	}
 
 	// - "Backstage passes" Quality drops to 0 after the concert
@@ -224,7 +225,7 @@ public class GildedRoseTest {
 	public void backStagePassesQualityGoesTo0AtTheEndOfDayOfTheConcert() {
 		int SELLIN = 0;
 		int QUALITY = 20;
-		app = initGildedRose(createItem(BACKSTAGE_PASSES, SELLIN, QUALITY));
+		initGildedRose(createItem(BACKSTAGE_PASSES, SELLIN, QUALITY));
 
 		app.updateQuality();
 
@@ -236,7 +237,7 @@ public class GildedRoseTest {
 	public void backStagePassesQualityIsStillZeroWhenFiveDaysAfterTheConcert() {
 		int SELLIN = -5;
 		int QUALITY = 20;
-		app = initGildedRose(createItem(BACKSTAGE_PASSES, SELLIN, QUALITY));
+		initGildedRose(createItem(BACKSTAGE_PASSES, SELLIN, QUALITY));
 
 		app.updateQuality();
 
@@ -245,7 +246,7 @@ public class GildedRoseTest {
 
 	@Test
 	public void itemCanPrettyPrint() {
-		app = initGildedRose(createItem(SULFURAS, SELLIN, SULFURAS_QUALITY));
+		initGildedRose(createItem(SULFURAS, SELLIN, SULFURAS_QUALITY));
 
 		String expectedString = "Sulfuras, Hand of Ragnaros, " + SELLIN + ", " + SULFURAS_QUALITY;
 		assertEquals(expectedString, app.items[0].toString());
@@ -254,7 +255,7 @@ public class GildedRoseTest {
 	@Test
 	public void UNDOCUMENTED_agedBrieStartingAbove50QualityDoesNotChangeQuality() {
 		QUALITY = 55;
-		app = initGildedRose(createItem(AGED_BRIE, SELLIN, QUALITY));
+		initGildedRose(createItem(AGED_BRIE, SELLIN, QUALITY));
 
 		app.updateQuality();
 		app.updateQuality();
@@ -266,8 +267,8 @@ public class GildedRoseTest {
 		return new Item(name, sellin, quality);
 	}
 
-	private GildedRose initGildedRose(Item item) {
-		return new GildedRose(new Item[] { item });
+	private void initGildedRose(Item item) {
+		app = new GildedRose(new Item[] { item });
 	}
 
 	private void assertQuality(int expectedQuality, Item item) {
@@ -279,9 +280,10 @@ public class GildedRoseTest {
 	}
 
 	@Test
-	public void causeNegativePathCoverageOnLines31and37() {
+	public void causeNegativePathCoverageOnProductionLines31and37() {
 		QUALITY = 49;
-		app = initGildedRose(createItem(BACKSTAGE_PASSES, SELLIN, QUALITY));
+		SELLIN = 4;
+		initGildedRose(createItem(BACKSTAGE_PASSES, SELLIN, QUALITY));
 
 		app.updateQuality();
 
@@ -289,9 +291,10 @@ public class GildedRoseTest {
 	}
 
 	@Test
-	public void causeCoverageOnLine62AndPositivePathOnLine61() {
+	public void causeCoverageOnLine62AndPositivePathOnProductionLine61() {
 		QUALITY = 49;
-		app = initGildedRose(createItem(AGED_BRIE, SELLIN, QUALITY));
+		SELLIN = -1;
+		initGildedRose(createItem(AGED_BRIE, SELLIN, QUALITY));
 
 		app.updateQuality();
 
@@ -299,10 +302,10 @@ public class GildedRoseTest {
 	}
 
 	@Test
-	public void causeCoverageToPositiveCaseOfLine51() {
+	public void causeCoverageToPositiveCaseOfProductionLine51() {
 		QUALITY = -1;
 		SELLIN = -1;
-		app = initGildedRose(createItem(AGED_BRIE, SELLIN, QUALITY));
+		initGildedRose(createItem(AGED_BRIE, SELLIN, QUALITY));
 
 		app.updateQuality();
 
@@ -310,10 +313,10 @@ public class GildedRoseTest {
 	}
 
 	@Test
-	public void causeCoverageToNegativeCaseOfLine52() {
+	public void causeCoverageToNegativeCaseOfProductionLine52() {
 		QUALITY = -1;
 		SELLIN = -1;
-		app = initGildedRose(createItem(ORDINARY_ITEM, SELLIN, QUALITY));
+		initGildedRose(createItem(ORDINARY_ITEM, SELLIN, QUALITY));
 
 		app.updateQuality();
 
@@ -321,9 +324,10 @@ public class GildedRoseTest {
 	}
 
 	@Test
-	public void causeCoverageToNegativeCaseOfLine53() {
+	public void causeCoverageToNegativeCaseOfProductionLine53() {
 		QUALITY = 5;
-		app = initGildedRose(createItem(SULFURAS, SELLIN, QUALITY));
+		SELLIN = -1;
+		initGildedRose(createItem(SULFURAS, SELLIN, QUALITY));
 
 		app.updateQuality();
 
